@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Explore why periodogram averaging reduces estimation variance for real Gaussian white noise.">
+<title>Periodogram Explorer | ENEE 630 Learning Lab</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/styles.css"><link rel="stylesheet" href="./periodogram.css">
+<script src="../assets/course.js" defer></script><script type="module" src="./periodogram.js"></script></head><body>
+<a class="skip-link" href="#main">Skip to lesson</a>
+<header class="site-header"><div class="container nav-row"><a class="brand" href="https://rhhanson-umd.github.io/"><span class="brand-mark">RH<span>.</span></span><span class="brand-label"><strong>LEARNING LAB</strong><small>RHHanson / UMD</small></span></a>
+<nav class="site-nav" aria-label="Primary"><a href="../index.html">ENEE 630 home</a><a href="#experiment">Experiment</a><a href="#reasoning">Reasoning</a></nav>
+<div class="nav-actions"><button class="theme-button" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">&#9790;</button></div></div></header>
+<main id="main"><section class="lesson-intro container"><span class="course-eyebrow">SPECTRAL ESTIMATION / VERIFIED NOV 13, 2026</span>
+<h1>Why averaging a <em>periodogram</em> helps.</h1>
+<p class="lesson-lead">A longer record does not necessarily make one spectral estimate more reliable. For real Gaussian white noise at zero frequency, a single periodogram remains noisy; averages of independent blocks become more concentrated.</p>
+<p class="fine">Original interactive learning example, not a homework solution. Normalized frequency <strong>f = 0 cycles/sample</strong>, independent zero-mean real Gaussian samples, and nonoverlapping blocks throughout.</p></section>
+<section id="experiment" class="container lesson-shell">
+<div class="panel"><div class="panel-heading"><div><span class="mini-label">01 / CONTROLS</span><h2>Change the experiment</h2></div><button id="reset" type="button" class="secondary-action">Reset example</button></div>
+<form id="parameters" class="control-grid">
+<label>Independent blocks, K <input id="blocks" type="number" min="1" max="32" step="1" value="8" required><small>More independent estimates to average</small></label>
+<label>Samples per block, L <input id="length" type="number" min="1" max="128" step="1" value="16" required><small>Total observed samples: N = K × L</small></label>
+<label>Noise standard deviation, σ <input id="sigma" type="number" min="0.1" max="20" step="0.1" value="1" required><small>True PSD at zero = σ²</small></label>
+<label>Random seed <input id="seed" type="number" min="0" max="4294967295" step="1" value="13" required><small>Deterministic replay of one realization</small></label></form>
+<div class="run-actions"><button type="button" class="primary-button" id="resample">Generate new record &#8635;</button><span id="status" role="status" aria-live="polite">Ready</span></div></div>
+<div class="metric-grid" aria-label="Numerical results">
+<div class="metric"><span>Total samples N</span><strong id="total">128</strong><small>N = K × L</small></div>
+<div class="metric"><span>True spectral power σ²</span><strong id="true-power">1.000</strong><small>Both estimators are unbiased</small></div>
+<div class="metric"><span>One full-record periodogram</span><strong id="single-result">—</strong><small>Variance stays at <span id="single-variance">2.000</span></small></div>
+<div class="metric"><span>Mean of K block periodograms</span><strong id="average-result">—</strong><small>Variance becomes <span id="average-variance">0.250</span></small></div></div>
+<div class="panel plot-panel"><div class="panel-heading"><div><span class="mini-label">02 / REPEATED EXPERIMENTS</span><h2>Sampling distributions</h2></div><span class="plot-counter">320 fresh records per setting</span></div>
+<p class="fine">Compare repeated estimates from the same number of observed samples. The horizontal axis measures estimated power divided by true power, so <strong>1</strong> is correct. The last bin includes all values at or above 5.</p>
+<div class="legend"><span><i class="swatch single"></i> Full-record periodogram</span><span><i class="swatch average"></i> K-block average</span></div>
+<svg id="distribution" viewBox="0 0 720 280" role="img" aria-label="Histograms comparing periodogram and averaged periodogram across repeated independent Gaussian records."></svg>
+<p id="hist-description" class="fine" aria-live="polite"></p>
+<div class="data-row"><span>Full-record empirical variance: <strong id="empirical-single">—</strong></span><span>Averaged empirical variance: <strong id="empirical-average">—</strong></span></div></div>
+<div class="panel"><div class="panel-heading"><div><span class="mini-label">03 / ONE RECORD, STEP BY STEP</span><h2>Inspect the arithmetic</h2></div><button type="button" class="secondary-action" id="next-step">Next reasoning step →</button></div>
+<p id="step-explanation" class="step-text" aria-live="polite"></p>
+<div class="table-wrap"><table><caption>Each block sum and its periodogram at f = 0, from the current realization</caption><thead><tr><th scope="col">Block m</th><th scope="col">Sum Sₘ</th><th scope="col">Iₘ(0) = Sₘ²/L</th></tr></thead><tbody id="block-rows"></tbody></table></div>
+<p class="fine" id="table-note"></p></div></section>
+<section id="reasoning" class="container lesson-theory"><span class="mini-label">04 / REASONING &amp; ASSUMPTIONS</span><h2>What the estimates mean</h2>
+<div class="theory-grid"><article><h3>Single periodogram</h3><p>From N independent samples, the zero-frequency transform is simply their sum.</p><div class="formula">I<sub>N</sub>(0) = (1/N) [Σ<sub>n=0</sub><sup>N−1</sup> x[n]]²</div><p>The sum is Gaussian with variance Nσ². Its normalized square has the chi-square distribution with one degree of freedom, no matter how large N gets.</p></article>
+<article><h3>Nonoverlapping block average</h3><p>Divide the same N = K × L samples into K independent blocks, each length L.</p><div class="formula">Ī(0) = (1/K) Σ<sub>m=1</sub><sup>K</sup> I<sub>m</sub>(0)</div><p>Each block's periodogram has mean σ² and variance 2σ⁴. Independence makes the variance of the average equal to 2σ⁴/K.</p></article></div>
+<div class="key-comparison"><strong>Both are unbiased:</strong> E[I<sub>N</sub>(0)] = E[Ī(0)] = σ². <strong>Only the average gains consistency</strong> as K tends to infinity under this model: Var[Ī(0)] = 2σ⁴/K → 0. Increasing L alone does not reduce the zero-frequency periodogram variance.</div>
+<details><summary>How the derivation works</summary><p>Let S = Σ x[n]. For independent x[n] distributed N(0, σ²), S is N(0, Nσ²). Therefore Z = S/(σ√N) is standard normal, and I<sub>N</sub>(0) = σ² Z². Since E[Z²] = 1 and Var[Z²] = 2, the expected periodogram is σ² and its variance is 2σ⁴. For K disjoint blocks, their normalized sums are independent standard normals. Averaging K independent squared normals divides the variance by K.</p></details>
+<details><summary>When this conclusion does not directly apply</summary><p>The exact chi-square-one result here requires real, zero-mean, independent Gaussian samples and frequency zero. For colored noise, non-Gaussian noise, nonzero frequencies, overlapping segments, or other window choices, the variance, bias, and independence structure may change. Segment averaging can also reduce frequency resolution and introduce bias when the underlying spectrum is not flat. These effects require separate analysis.</p></details>
+<p class="source-note"><strong>Source alignment:</strong> Topic and transform convention checked against ENEE 630 Recitation 10 (Nov 13, 2026), handwritten notes, pp. 1–3, and Lecture 19 notes (Nov 11, 2026), pp. 2–4. This original demonstration uses newly generated data and does not reproduce course assignments or instructor figures.</p>
+<p class="lesson-back"><a href="../index.html">← Return to ENEE 630</a></p></section></main>
+<footer><div class="container footer-row"><div class="footer-brand"><span class="brand-mark">RH<span>.</span></span><span>Independent educational project.<br>Not an official University of Maryland website.</span></div><div class="footer-links"><a href="https://rhhanson-umd.github.io/">Portal</a><a href="../index.html">ENEE 630</a><a href="https://github.com/RHHanson-UMD/ENEE-630">Source</a></div></div></footer></body></html>
