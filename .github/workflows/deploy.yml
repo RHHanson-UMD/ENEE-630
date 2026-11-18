@@ -9,7 +9,8 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  # Preserve active deploy jobs; newer pushes queue instead of cancelling them.
+  cancel-in-progress: false
 jobs:
   deploy:
     environment:
