@@ -82,3 +82,9 @@ For every new numerical engine:
 Finish with a short factual report covering: **(1)** exact sources opened (without private URLs), **(2)** files changed, **(3)** mathematical and UI tests actually performed, **(4)** PR/commit URL or absence of changes, **(5)** Pages status and whether the public page was independently verified, **(6)** licensing/privacy/coverage uncertainties, and **(7)** the next concrete work item and checkpoint.
 
 These instructions apply to this repository only. Follow any more specific verified file-level conventions when consistent with these publication protections.
+
+## Repository instruction maintenance (issue #7)
+
+Keep this file updated alongside changes to the public lesson structure, `package.json`, workflows or audit conventions. Review `AGENTS.md` together with the existing #2 source-and-figure inventory and #8 structured registry whenever new figures are catalogued; one verified figure identifier or source page is not evidence that the entire source was audited. Follow the project's **desktop-focused** scope while retaining usable small-screen layout where already present; do not invent a new mobile-first requirement. If a requested source-specific update cannot open the original instructor material, record the source as unavailable and avoid inventing notation or release status.
+
+When a maintenance PR changes only these instructions, perform text/path/privacy checks and request normal CI; report Node mathematical tests as *not executed* if they have not been run. Do not claim a Pages update or successful CI until observed separately.
