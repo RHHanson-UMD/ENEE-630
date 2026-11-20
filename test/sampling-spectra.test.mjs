@@ -53,7 +53,7 @@ test("reject invalid arguments",()=>{
 });
 test("course-cover and both lesson links are present in live-site source tree",()=>{
  const html=readFileSync("site/index.html","utf8");
- assert.match(html,/enee630-course-cover\.webp/);
+ assert.match(html,/ENEE%20630%20Cover\.png/);
  assert.match(html,/sampling-aliasing\.html/);
  assert.match(html,/spectral-leakage\.html/);
  for(const page of ["site/visualizations/sampling-aliasing.html","site/visualizations/spectral-leakage.html"]){
@@ -65,10 +65,11 @@ test("course-cover and both lesson links are present in live-site source tree",(
  }
 });
 
-test("optimized user-provided course cover is a valid WebP asset in the published tree",()=>{
- const bytes=readFileSync("site/assets/enee630-course-cover.webp");
+test("original user-uploaded course cover is a valid PNG asset in the published tree",()=>{
+ const bytes=readFileSync("site/assets/ENEE 630 Cover.png");
  assert.ok(bytes.byteLength>1000);
- assert.equal(bytes.toString("ascii",0,4),"RIFF");
- assert.equal(bytes.toString("ascii",8,12),"WEBP");
- assert.equal(bytes.readUInt32LE(4)+8,bytes.byteLength);
+ assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10]);
+ assert.equal(bytes.toString("ascii",12,16),"IHDR");
+ assert.ok(bytes.readUInt32BE(16)>=500);
+ assert.ok(bytes.readUInt32BE(20)>=500);
 });
