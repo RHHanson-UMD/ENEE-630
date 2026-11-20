@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ENEE 630 Learning Guide | Independent Learning Lab</title>
+<meta name="description" content="A source-informed ENEE 630 topic map and original mastery checklist, distinguishing confirmed instruction from tentative scheduling.">
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./assets/styles.css">
+<script src="./assets/course.js" defer></script>
+<style>
+.guide{max-width:970px;padding:60px 0 95px}.guide h1{font:700 clamp(2.1rem,5vw,3.5rem)/1.15 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:16px 0 20px}.guide h2{font:700 1.6rem/1.3 'Space Grotesk',sans-serif;margin:44px 0 16px}.guide h3{font:700 1.1rem/1.3 'Space Grotesk',sans-serif;margin-bottom:7px}.guide p,.guide li{color:var(--muted)}.guide a:not(.brand){text-decoration:underline;text-underline-offset:3px}.guide a:hover{color:var(--mint)}.guide section{border-top:1px solid var(--line);padding-top:10px}.intro{max-width:790px}.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px;margin:20px 0}.guide-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:23px}.guide-card p{margin-bottom:8px}.status-line{color:var(--mint)!important;font-size:.83rem;font-weight:700;letter-spacing:.01em}.guide-checks li{margin-bottom:11px}.guide .formula{background:var(--surface2);border:1px solid var(--line);padding:15px;border-radius:10px;overflow-wrap:anywhere;color:var(--ink);margin:15px 0}.guide details{background:var(--surface);border:1px solid var(--line);padding:14px 17px;margin:12px 0;border-radius:12px}.guide summary{cursor:pointer;font-weight:700}.fineprint{font-size:.89rem;color:var(--faint)!important}.guide ul{padding-left:23px}.guide a:focus-visible,.guide summary:focus-visible{outline:3px solid var(--mint);outline-offset:3px}@media(max-width:600px){.guide{padding:36px 0 65px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to guide</a>
+<header class="site-header"><div class="container nav-row">
+<a class="brand" href="./index.html"><span class="brand-mark">RH<span>.</span></span><span class="brand-label"><strong>ENEE 630</strong><small>Independent Learning Lab</small></span></a>
+<nav class="site-nav" aria-label="Primary"><a href="./index.html">Course home</a><a href="#mastery">Mastery checks</a><a href="#sources">References</a></nav>
+<div class="nav-actions"><button class="theme-button" id="theme-toggle" type="button" aria-label="Toggle theme" title="Toggle theme">&#9790;</button></div>
+</div></header>
+<main id="main" class="guide container">
+<p class="section-label">ENEE 630 / SOURCE-INFORMED STUDY GUIDE</p>
+<h1>From advanced DSP models to reliable conclusions.</h1>
+<p class="intro">This independent guide organizes the four subject pillars of the Fall 2026 ENEE 630 syllabus and connects them to original practice questions. The <strong>syllabus schedule is tentative</strong>: an available lecture deck or scheduled date alone does not prove a topic was presented. The coverage notes below reflect the specific class-source evidence checked through November 20, 2026.</p>
+<p class="fineprint">No instructor handouts, class recordings, solution keys, private access links, or original course figures are reproduced here.</p>
+
+<section id="topics"><h2>Four subject pillars</h2>
+<div class="guide-grid">
+<article class="guide-card"><h3>1. Multirate signal processing</h3><p class="status-line">Syllabus pillar; older lecture-page audit pending</p><p>Sampling-rate conversion, aliasing and spectral images, polyphase structures and analysis/synthesis filter banks.</p></article>
+<article class="guide-card"><h3>2. Prediction and filtering</h3><p class="status-line">Confirmed in November 2 and 9 notes</p><p>Linear-MMSE projection, covariance structure, forward/backward prediction, Levinson–Durbin recursion and state-space innovations.</p></article>
+<article class="guide-card"><h3>3. Spectral estimation</h3><p class="status-line">Confirmed in November 11, 16 and 18 instruction</p><p>Finite-record periodograms; bias, variance and resolution; independent averaging and tapering; multitaper estimation and AR model comparison.</p></article>
+<article class="guide-card"><h3>4. Sparsity-aware signal processing</h3><p class="status-line">Scheduled from November 23; not yet confirmed as taught</p><p>Sparse representations and estimation are future syllabus topics. Confirm actual classroom coverage and exact assumptions before publishing a source-specific lesson.</p></article>
+</div>
+<p class="fineprint">November 16 and 18 coverage is supported by the corresponding class transcripts. Lecture 20 and 21 handwritten PDFs are available, but their diagrams have not yet passed a page-by-page visual audit. The November 20 recitation transcript is incomplete/noisy, so its detailed mathematical statements are not treated as verified notation.</p>
+</section>
+
+<section id="mastery"><h2>Original mastery checklist</h2>
+<p>Use these as self-assessment prompts rather than assignment solutions. Explain the assumptions and test at least one failure case before relying on a result.</p>
+<ul class="guide-checks">
+<li><strong>Sampling and dimensions:</strong> Can you convert between physical frequency in Hz and normalized frequency in cycles/sample? Can you identify what aliases after decimation?</li>
+<li><strong>Stochastic processes:</strong> Can you state what wide-sense stationarity implies for mean, autocorrelation and power spectral density? How does a finite realization differ from an ensemble?</li>
+<li><strong>Linear estimation:</strong> Can you demonstrate the error-orthogonality condition for a linear-MMSE estimate, and explain what changes when its covariance matrix is singular?</li>
+<li><strong>Prediction:</strong> Can you distinguish forward and backward sample indexing and verify a low-order Toeplitz solve against an independently calculated covariance system?</li>
+<li><strong>Finite-record spectra:</strong> Can you derive the periodogram's frequency normalization and explain spectral leakage without treating a single estimate as the true PSD?</li>
+<li><strong>Bias/variance:</strong> Can you distinguish increasing record length from averaging independent estimates? How do window length and number of segments trade frequency resolution against variance?</li>
+<li><strong>Model choice:</strong> Can you identify the stationarity and AR-order assumptions behind parametric spectral estimation and explain what model mismatch does to the estimate?</li>
+<li><strong>Evidence quality:</strong> Can you state which conclusion is mathematical, which is synthetic simulation evidence and which depends on the observed course example?</li>
+</ul>
+<div class="formula">Normalized frequency convention: f = ω / (2π) cycles/sample; physical frequency F = f × F<sub>s</sub> Hz for sampling rate F<sub>s</sub> samples/second.</div>
+<p class="fineprint">The exact November 16 class discussion explicitly uses normalized non-angular frequency f = ω/(2π). Some other conventions in external references may differ.</p>
+</section>
+
+<section id="reasoning"><h2>One original reasoning exercise</h2>
+<p><strong>Scenario:</strong> You record independent, zero-mean, real Gaussian white-noise samples with variance σ² and estimate spectral power at zero frequency.</p>
+<details><summary>Why doesn't one longer periodogram automatically become reliable?</summary>
+<p>For the specific model, the normalized zero-frequency sum is standard Gaussian, so its squared magnitude has a chi-square distribution with one degree of freedom. Its variance remains 2σ⁴ regardless of sample length; increasing the record length does not make this single zero-frequency estimate consistent.</p></details>
+<details><summary>What changes when independent blocks are averaged?</summary>
+<p>With K independent blocks, the average retains mean σ² and its variance becomes 2σ⁴/K. That exact reduction relies on the independence and Gaussian assumptions; overlapping or correlated segments require separate analysis. Increasing K while total data is fixed also shortens each block, affecting frequency resolution for colored spectra.</p></details>
+<p><a href="./visualizations/periodogram.html">Experiment with the original periodogram explorer</a> to change K, block length, noise level and seed, then compare empirical with analytic results.</p>
+</section>
+
+<section id="sources"><h2>Source provenance and further reading</h2>
+<p>This guide paraphrases course objectives from <em>ENEE 630 Fall 2026 Syllabus</em> (p. 1) and uses only neutral evidence locations for confirmation: <em>Lecture 16</em> (November 2, notes pp. 1–5), <em>Lecture 18</em> (November 9, notes pp. 1–3), <em>Lecture 19</em> (November 11, notes pp. 1–4), and the November 16 and 18 lecture transcripts. The diagrams and personal material remain private.</p>
+<p>The syllabus lists the following as references, <strong>not automatically mandatory textbooks</strong>:</p>
+<ul>
+<li>P. P. Vaidyanathan, <em>Multirate Systems and Filter Banks</em> (1993).</li>
+<li>S. Haykin, <em>Adaptive Filter Theory</em>, 4th ed. (2002).</li>
+<li>S. M. Kay, <em>Modern Spectral Estimation: Theory &amp; Applications</em> (1988).</li>
+<li>S. Theodoridis, <em>Machine Learning: A Bayesian and Optimization Perspective</em>, 2nd ed. (2020).</li>
+</ul>
+<p class="fineprint">Bibliographic details are from the syllabus; independent publisher-link verification and an external-resource library are still pending. This site is not affiliated with or endorsed by the University of Maryland.</p>
+<p><a href="./index.html">Return to course home</a></p>
+</section>
+</main>
+<footer><div class="container footer-row"><div class="footer-brand"><span>Independent student-created teaching resource; not an official UMD site.</span></div><div class="footer-links"><a href="./index.html">ENEE 630 home</a><a href="https://github.com/RHHanson-UMD/ENEE-630">Source</a></div></div></footer>
+</body></html>
