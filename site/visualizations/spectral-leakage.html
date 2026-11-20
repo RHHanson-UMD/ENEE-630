@@ -1,0 +1,47 @@
+<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Spectral Leakage and Windows | ENEE 630 Learning Lab</title><meta name="description" content="Interactive original DFT spectral leakage and Hann window explorer"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/styles.css"><link rel="stylesheet" href="./sampling-spectra.css"><script src="../assets/course.js" defer></script></head><body>
+<a class="skip-link" href="#main">Skip to experiment</a><header class="site-header"><div class="container nav-row"><a class="brand" href="../index.html"><span class="brand-mark">RH<span>.</span></span><span class="brand-label"><strong>ENEE 630</strong><small>Independent Learning Lab</small></span></a><nav class="site-nav" aria-label="Primary"><a href="../index.html#spectral">Spectral topics</a><a href="../learning-guide.html">Mastery guide</a></nav><div class="nav-actions"><button class="theme-button" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">&#9790;</button></div></div></header>
+<main class="lab-shell container" id="main"><p class="section-label">SPECTRAL ESTIMATION / ORIGINAL SYNTHETIC EXAMPLE</p><h1>Where did the spectral power go?</h1><p>Change sinusoid frequency, record length, phase and taper to see DFT energy spread between bins. This is a deterministic sinusoid experiment: it illustrates leakage, <strong>not</strong> the statistical variance or consistency of a random-process periodogram.</p>
+<section class="lab-panel"><h2>Explore a finite record</h2><div class="lab-controls">
+<label>Record length N<input type="number" id="N" min="8" max="128" step="1" value="32"><small>Number of observed samples</small></label>
+<label>Sinusoid frequency (cycles/sample)<input type="number" id="freq" min="0" max="0.5" step="0.005" value="0.171875"><small>Normalized f = ω/(2π)</small></label>
+<label>Window<select id="window"><option value="rectangular">Rectangular</option><option value="hann">Hann</option></select><small>Hann trades wider main lobe for lower sidelobes</small></label>
+<label>Phase (degrees)<input type="number" id="phase" min="-180" max="180" step="15" value="0"><small>Finite-record DFT shape can depend on phase</small></label></div>
+<div class="lab-actions"><button type="button" id="reset">Reset</button><button type="button" id="onbin">Set to exact DFT bin</button><button type="button" id="offbin">Shift to half-bin offset</button></div><p id="error" class="lab-error" role="status" aria-live="polite"></p>
+<div class="lab-output"><div><small>Bin spacing Δf</small><strong id="spacing">—</strong></div><div><small>Offset from nearest bin</small><strong id="offset">—</strong></div><div><small>Largest one-sided amplitude</small><strong id="peak">—</strong></div><div><small>Parseval energy difference</small><strong id="parseval">—</strong></div></div>
+<canvas id="spectrum" class="lab-plot" width="980" height="460" role="img" aria-label="Windowed one-sided DFT amplitude across frequency bins">Exact values are available in the summary and steps below.</canvas><p id="summary" role="status" aria-live="polite" class="lab-muted"></p></section>
+<section class="lab-panel"><h2>Understand each transformation</h2>
+<details open><summary>1. Observe and taper a finite sequence</summary><p class="lab-formula">x[n] = cos(2πfn + φ), n = 0, …, N−1; y[n] = w[n]x[n].</p><p>Rectangular weights are 1. The symmetric Hann weights are 0.5(1 − cos(2πn/(N−1))). Multiplying samples by the window corresponds to periodic convolution in frequency.</p></details>
+<details><summary>2. Evaluate the discrete Fourier transform</summary><p class="lab-formula">Y[k] = ∑ y[n] e<sup>−j2πkn/N</sup>; f<sub>k</sub> = k/N.</p><p>The graph shows one-sided amplitudes |Y[k]|/sum(w), doubled for interior positive-frequency bins. DC and Nyquist bins are not doubled. This coherent-gain correction is illustrative, not a power spectral density normalization.</p></details>
+<details><summary>3. Check the energy identity</summary><p class="lab-formula">∑ |w[n]x[n]|² = (1/N) ∑<sub>k=0</sub><sup>N−1</sup> |Y[k]|².</p><p>Parseval's identity holds for either window, including when the input frequency is off-grid. The difference reported above should be near numerical floating-point precision.</p></details>
+<details><summary>4. Examine exceptions and tradeoffs</summary><p>At a non-DC/Nyquist integer-bin cosine, a rectangular window aligns the signal with DFT bins. Shift it by half a bin: the sidelobes spread across frequencies. A Hann window suppresses far sidelobes but broadens the main lobe and changes apparent peak height; it does not magically eliminate all leakage, fix stochastic variance, or create new frequency resolution. Zero-padding could interpolate the display without adding information.</p></details>
+<p class="lab-muted">Evidence: the November 16, 2026 ENEE 630 lecture transcript describes finite-record periodograms, triangular lag weighting, tapering and spectral smoothing. This original DFT visualization uses independent synthetic signals. It does not reproduce a classroom graphic, clinical data, or instructor solutions. Full PDF figure audit remains pending.</p></section>
+<p><a href="../index.html#spectral">Back to spectral estimation topics</a> · <a href="./sampling-aliasing.html">Explore aliasing</a> · <a href="./periodogram.html">Compare independent averaged periodograms</a></p></main><footer><div class="container footer-row">Independent student-created learning resource; not an official UMD course website.</div></footer>
+<script type="module">
+import {dftWindowedCosine} from "./sampling-spectra-engine.js";
+const $=id=>document.getElementById(id),inputs=["N","freq","window","phase"];
+function render(){
+ try{
+ for(const k of ["N","freq","phase"])if($(k).value.trim()==="")throw new RangeError("Complete all numeric fields.");
+ const N=Number($("N").value),f=Number($("freq").value),p=Number($("phase").value);
+ if(Math.abs(p)>180)throw new RangeError("Phase outside allowed range.");
+ const r=dftWindowedCosine({N,frequency:f,window:$("window").value,phase:p*Math.PI/180});
+ $("error").textContent="";$("spacing").textContent=r.resolution.toFixed(5);$("offset").textContent=r.centerDistance.toFixed(3)+" bins";
+ $("peak").textContent=r.peak.amplitude.toFixed(4);$("parseval").textContent=Math.abs(r.weightedEnergy-r.spectralEnergy).toExponential(2);
+ $("summary").textContent="Largest bin "+r.peak.bin+" at "+r.peak.cyclesPerSample.toFixed(5)+" cycles/sample. Window sum "+r.sumWeights.toFixed(3)+". The graph is one-sided coherent-gain-corrected amplitude, not a PSD.";
+ const canvas=$("spectrum"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,pad=64;
+ const css=getComputedStyle(document.documentElement),ink=css.getPropertyValue("--ink").trim()||"#fff",muted=css.getPropertyValue("--muted").trim()||"#aaa";
+ ctx.clearRect(0,0,W,H);ctx.fillStyle=css.getPropertyValue("--bg").trim()||"#101820";ctx.fillRect(0,0,W,H);
+ const max=Math.max(1,r.peak.amplitude*1.07);ctx.strokeStyle=muted;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,36);ctx.lineTo(pad,H-64);ctx.lineTo(W-26,H-64);ctx.stroke();
+ ctx.fillStyle=ink;ctx.font="17px system-ui";ctx.fillText("Amplitude",pad+5,26);ctx.fillText("Frequency (cycles/sample)",W/2-115,H-14);
+ ctx.fillStyle=muted;for(let j=0;j<=4;j++)ctx.fillText((j/8).toFixed(3),pad+(W-pad-35)*j/4-18,H-36);
+ ctx.fillStyle="#55c9fb";ctx.strokeStyle="#55c9fb";ctx.lineWidth=3;
+ for(const s of r.spectrum){const x=pad+(W-pad-35)*(s.cyclesPerSample/.5), y=H-64-(H-115)*s.amplitude/max;ctx.beginPath();ctx.moveTo(x,H-64);ctx.lineTo(x,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,3,0,2*Math.PI);ctx.fill()}
+ const target=pad+(W-pad-35)*(r.frequency/.5);ctx.strokeStyle="#f5c06d";ctx.setLineDash([7,7]);ctx.beginPath();ctx.moveTo(target,40);ctx.lineTo(target,H-64);ctx.stroke();ctx.setLineDash([]);
+ }catch(e){$("error").textContent=e.message;["spacing","offset","peak","parseval"].forEach(k=>$(k).textContent="—");$("summary").textContent="Inputs are invalid; spectrum unavailable.";}
+}
+inputs.forEach(k=>$(k).addEventListener("input",render));
+$("reset").addEventListener("click",()=>{Object.entries({N:32,freq:0.171875,window:"rectangular",phase:0}).forEach(([k,v])=>$(k).value=v);render();$("freq").focus()});
+$("onbin").addEventListener("click",()=>{$("freq").value=(Math.max(1,Math.min(Math.floor(Number($("N").value)/2)-1,Math.round(Number($("freq").value)*Number($("N").value))))/Number($("N").value)).toFixed(8);render();$("freq").focus()});
+$("offbin").addEventListener("click",()=>{$("freq").value=(Math.max(1,Math.min(Math.floor(Number($("N").value)/2)-2,Math.floor(Number($("freq").value)*Number($("N").value))))+0.5)/Number($("N").value);render();$("freq").focus()});
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});render();
+</script></body></html>
