@@ -1,0 +1,85 @@
+<!doctype html><html lang="en" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linear Prediction Explorer | ENEE 630 Learning Lab</title>
+<meta name="description" content="Original interactive forward and backward linear prediction with a stationary Gaussian AR(1) process.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/styles.css">
+<script src="../assets/course.js" defer></script>
+<style>
+.lesson{max-width:1000px;padding:55px 0 90px}.lesson h1{font:700 clamp(2rem,5vw,3.3rem)/1.12 'Space Grotesk',sans-serif;margin:12px 0 23px;letter-spacing:-.04em}.lesson h2{font:700 1.45rem/1.3 'Space Grotesk',sans-serif;margin:0 0 13px}.lesson p,.lesson li{color:var(--muted)}.lesson a{text-decoration:underline;text-underline-offset:3px}.lesson a:focus-visible,.lesson select:focus-visible,.lesson input:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
+.panel2{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;margin:20px 0}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:17px}.controls label{display:grid;gap:6px;font-weight:700;font-size:.93rem}.controls small{color:var(--faint);font-weight:400}.controls input,.controls select{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px;color:var(--ink);min-width:0}.value-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.value-grid div{background:var(--surface2);padding:17px;border-radius:12px}.value-grid span{display:block;color:var(--muted);font-size:.82rem}.value-grid strong{font-size:1.3rem}.timeline{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:16px 0}.sample{border:1px solid var(--line);background:var(--surface2);border-radius:11px;padding:12px 15px;min-width:75px;text-align:center}.sample b,.sample span{display:block}.sample span{font-size:.82rem;color:var(--muted)}.sample.target{border-color:var(--mint)}.sample.observed{border-color:var(--violet)}.sample.unused{opacity:.55}.sample .name{color:var(--ink)}.lesson .formula{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:12px 16px;overflow-wrap:anywhere;color:var(--ink)}.fine{font-size:.9rem}.status2{color:var(--mint)!important}.secondary-action{background:var(--surface2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px 15px;cursor:pointer}.message{min-height:1.3em}@media(max-width:600px){.lesson{padding:32px 0 65px}.panel2{padding:16px}}
+</style>
+</head><body>
+<a class="skip-link" href="#main">Skip to lesson</a>
+<header class="site-header"><div class="container nav-row">
+<a class="brand" href="../index.html"><span class="brand-mark">RH<span>.</span></span><span class="brand-label"><strong>ENEE 630</strong><small>Independent Learning Lab</small></span></a>
+<nav class="site-nav" aria-label="Primary"><a href="../index.html">Course home</a><a href="#experiment">Experiment</a><a href="#reasoning">Derivation</a></nav>
+<div class="nav-actions"><button class="theme-button" id="theme-toggle" type="button" aria-label="Toggle theme">&#9790;</button></div></div></header>
+<main class="container lesson" id="main">
+<p class="section-label">LINEAR PREDICTION / ORIGINAL EXAMPLE</p>
+<h1>Predict forward or backward. Check what changes.</h1>
+<p>Explore optimal one-sided linear prediction for a <strong>zero-mean, stationary Gaussian AR(1) process</strong> with covariance r[k] = σ²ρ<sup>|k|</sup>. The model is deliberately simple: it demonstrates how prediction direction and order relate to error orthogonality without using instructor problem parameters.</p>
+<section class="panel2" id="experiment">
+<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><h2>Set the model and observations</h2><button type="button" class="secondary-action" id="reset">Reset</button></div>
+<form id="controls" class="controls">
+<label>Direction<select id="direction"><option value="forward">Forward (from past)</option><option value="backward">Backward (from future)</option></select><small>Which side of X[0] is observed?</small></label>
+<label>Predictor order M<input id="order" type="number" min="0" max="6" step="1" value="3" required><small>Use zero to remove all observations</small></label>
+<label>Correlation ρ<input id="rho" type="number" min="-0.95" max="0.95" step="0.05" value="0.65" required><small>Stationarity requires |ρ| &lt; 1</small></label>
+<label>Process variance σ²<input id="variance" type="number" min="0.1" max="100" step="0.1" value="2" required><small>Variance of X[n], not innovation variance</small></label>
+<label>Nearest observation value<input id="neighbor" type="number" min="-100" max="100" step="0.1" value="1.5" required><small>Sample X[-1] or X[+1]</small></label>
+</form>
+<p id="message" role="status" aria-live="polite" class="message fine"></p>
+<div class="value-grid" aria-label="Computed prediction statistics">
+<div><span>Conditional linear prediction for X[0]</span><strong id="prediction">—</strong></div>
+<div><span>Minimum mean-squared error</span><strong id="mse">—</strong></div>
+<div><span>Optimal coefficients, nearest first</span><strong id="coefficients">—</strong></div></div>
+</section>
+<section class="panel2"><h2>Which samples matter?</h2>
+<p>Samples in violet are observed regressors. The target at time 0 is highlighted; other timeline samples are not used. Read the optimal coefficients in order from nearest to farthest.</p>
+<div id="timeline" class="timeline" role="group" aria-label="Time-indexed samples for linear prediction"></div>
+<p class="fine" id="observation-desc"></p></section>
+<section class="panel2" id="reasoning"><h2>Why is the error orthogonal?</h2>
+<div class="formula">X̂[0] = Σ<sub>j=1</sub><sup>M</sup> a<sub>j</sub> X[±j], &nbsp; e = X[0] − X̂[0]</div>
+<p>Under this stationary Gaussian AR(1) model, the nearest neighbor is sufficient for one-sided prediction. For M ≥ 1, the optimal coefficient vector is [ρ, 0, …, 0]. For M = 0, the prediction is zero and the MSE equals σ².</p>
+<div class="formula">For M ≥ 1: Var(e) = σ²(1 − ρ²); &nbsp; Cov(e, X[±j]) = r[j] − ρr[j−1] = 0.</div>
+<p id="covariance-check" aria-live="polite"></p>
+<details><summary>What does this example not establish?</summary><p>For a general stationary process, extra observed lags can improve prediction and forward/backward coefficient vectors need not match. The AR(1) Gaussian Markov structure gives the special simplification above. |ρ| ≥ 1 is outside this stationary covariance example. An observed neighboring value is not the true target, so the conditional mean is a prediction, not an exact observed X[0].</p></details>
+<p class="fine"><strong>Course alignment:</strong> Independent synthetic illustration of forward/backward prediction, Toeplitz covariance and orthogonality discussed in ENEE 630 Lecture 16 (November 2, 2026), notes pp. 1–5. No classroom figure, worked recitation parameters or homework solution are reproduced.</p>
+</section>
+<p><a href="../learning-guide.html">Return to mastery guide</a> · <a href="../index.html">ENEE 630 home</a></p>
+</main>
+<footer><div class="container footer-row"><div>Independent student-created learning resource; not an official UMD site.</div><div class="footer-links"><a href="../index.html">Home</a><a href="https://github.com/RHHanson-UMD/ENEE-630">Source</a></div></div></footer>
+<script type="module">
+import {predictionState} from "./prediction-engine.js";
+const ids=["direction","order","rho","variance","neighbor"];
+const el=id=>document.getElementById(id);
+const defaults={direction:"forward",order:"3",rho:"0.65",variance:"2",neighbor:"1.5"};
+function render(){
+  try{
+    const p=predictionState({direction:el("direction").value,order:Number(el("order").value),rho:Number(el("rho").value),variance:Number(el("variance").value),neighbor:Number(el("neighbor").value)});
+    if(ids.slice(1).some(k=>el(k).value.trim()==="")) throw new RangeError("Complete all numeric fields.");
+    el("message").textContent="Parameters valid. All displayed quantities use the chosen process-variance units.";
+    el("prediction").textContent=p.prediction.toFixed(4);
+    el("mse").textContent=p.errorVariance.toFixed(4);
+    el("coefficients").textContent=p.coefficients.length?p.coefficients.map(v=>v.toFixed(3)).join(", "):"(none)";
+    const span=Math.max(3,p.indices.length); const values=Array.from({length:span*2+1},(_,k)=>k-span);
+    const shown=values.filter(k=>k===0||p.indices.includes(k));
+    el("timeline").replaceChildren(...shown.map(k=>{
+      const div=document.createElement("div");div.className="sample "+(k===0?"target":"observed");
+      const name=document.createElement("b");name.className="name";name.textContent="X["+(k>0?"+":"")+k+"]";
+      const status=document.createElement("span");status.textContent=k===0?"target":"observed";
+      div.append(name,status);return div;
+    }));
+    el("observation-desc").textContent=p.indices.length?"Observed sample indices: "+p.indices.join(", ")+". Other values are not supplied.":"No observations selected. The best linear prediction is the mean zero.";
+    const mx=p.residualCovariances.length?Math.max(...p.residualCovariances.map(Math.abs)):0;
+    el("covariance-check").textContent="Orthogonality check: "+(p.indices.length?p.residualCovariances.map((v,i)=>"Cov(e,X["+(p.indices[i]>0?"+":"")+p.indices[i]+"])="+v.toExponential(2)).join("; "):"no regressors to test")+"; maximum absolute residual covariance = "+mx.toExponential(2)+".";
+  }catch(error){
+    el("message").textContent="Invalid input: "+error.message;
+    ["prediction","mse","coefficients"].forEach(k=>el(k).textContent="—");
+    el("timeline").replaceChildren();el("covariance-check").textContent="";el("observation-desc").textContent="";
+  }
+}
+ids.forEach(k=>el(k).addEventListener("input",render));
+el("reset").addEventListener("click",()=>{for(const [k,v] of Object.entries(defaults))el(k).value=v;render();el("direction").focus();});
+render();
+</script></body></html>
