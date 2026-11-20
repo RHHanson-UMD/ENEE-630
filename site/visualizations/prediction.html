@@ -62,7 +62,7 @@ function render(){
     el("prediction").textContent=p.prediction.toFixed(4);
     el("mse").textContent=p.errorVariance.toFixed(4);
     el("coefficients").textContent=p.coefficients.length?p.coefficients.map(v=>v.toFixed(3)).join(", "):"(none)";
-    const values=Array.from({length:7},(_,k)=>k-3);
+    const span=Math.max(3,p.indices.length); const values=Array.from({length:span*2+1},(_,k)=>k-span);
     const shown=values.filter(k=>k===0||p.indices.includes(k));
     el("timeline").replaceChildren(...shown.map(k=>{
       const div=document.createElement("div");div.className="sample "+(k===0?"target":"observed");
