@@ -72,3 +72,9 @@
 .topic-lesson span{font-size:12px;color:var(--muted)}
 .topic-lesson:hover,.topic-lesson:focus-visible{background:var(--surface2);outline-offset:3px}
 @media(max-width:600px){.topic-group summary{padding:17px 15px;gap:12px}.topic-content{padding:16px 18px}.topic-index{font-size:12px}}
+
+/* User-provided ENEE 630 cover: compact preview, not reproduced instructor material. */
+.course-cover{margin:0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(150deg,var(--surface),var(--bg));padding:17px;box-shadow:var(--cardshadow);display:grid;gap:11px;place-items:center;overflow:hidden}
+ .course-cover img{display:block;width:min(100%,220px);height:auto;aspect-ratio:1;object-fit:contain;image-rendering:auto;border-radius:8px}
+.course-cover figcaption{font:700 10px/1.4 'Space Grotesk',sans-serif;letter-spacing:.15em;color:var(--faint);text-align:center}
+@media(max-width:800px){.course-cover{max-width:420px}}

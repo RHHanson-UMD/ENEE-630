@@ -1,0 +1,43 @@
+<!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sampling and Aliasing | ENEE 630 Learning Lab</title><meta name="description" content="Original interactive sampling aliasing explorer with exact Nyquist boundary checks."><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/styles.css"><link rel="stylesheet" href="./sampling-spectra.css"><script src="../assets/course.js" defer></script></head><body><a class="skip-link" href="#main">Skip to experiment</a><header class="site-header"><div class="container nav-row"><a class="brand" href="../index.html"><span class="brand-mark">RH<span>.</span></span><span class="brand-label"><strong>ENEE 630</strong><small>Independent Learning Lab</small></span></a><nav class="site-nav" aria-label="Primary"><a href="../index.html#multirate">Multirate topics</a><a href="../learning-guide.html">Mastery guide</a></nav><div class="nav-actions"><button class="theme-button" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">&#9790;</button></div></div></header><main id="main" class="lab-shell container"><p class="section-label">MULTIRATE SIGNAL PROCESSING / ORIGINAL SYNTHETIC EXAMPLE</p><h1>Sampling and aliasing explorer.</h1><p>Sample a continuous-time cosine at adjustable frequencies. Watch distinct continuous frequencies produce the same discrete samples and inspect the Nyquist boundary.</p>
+<section class="lab-panel" aria-labelledby="controls-label"><h2 id="controls-label">Change the signal</h2>
+<div class="lab-controls"><label>Input cosine frequency (Hz)<input id="signal" type="number" min="0" max="250" step="1" value="28"><small>Continuous source frequency</small></label><label>Sampling rate (samples/sec)<input id="rate" type="number" min="2" max="100" step="1" value="40"><small>Controls Nyquist frequency</small></label><label>Phase (degrees)<input id="phase" type="number" min="-180" max="180" step="15" value="0"><small>Phase makes some sample coincidences clearer</small></label><label>Number of samples<input id="count" type="number" min="8" max="64" step="1" value="24"><small>Display window only</small></label></div>
+<div class="lab-actions"><button id="reset" type="button">Reset inputs</button><button id="preset" type="button">Try 12 Hz vs 28 Hz</button></div><p id="error" class="lab-error" role="status" aria-live="polite"></p>
+<div class="lab-output"><div><small>Nyquist frequency</small><strong id="nyquist">—</strong></div><div><small>Observed alias frequency</small><strong id="alias">—</strong></div><div><small>Strict sampling condition</small><strong id="condition">—</strong></div></div>
+<canvas id="graph" class="lab-plot" width="980" height="460" role="img" aria-label="Sampled cosine plotted against time, with corresponding aliased cosine overlay">This graph requires canvas. Exact numerical values appear above.</canvas><p id="chart-description" class="lab-muted" aria-live="polite"></p></section>
+<section class="lab-panel"><h2>Work through the reasoning</h2><p class="lab-formula">x[n] = cos(2π · f<sub>0</sub> · n / F<sub>s</sub> + φ)</p>
+<details open><summary>Step 1 — Compute the folding frequency</summary><p>Compute the remainder of f<sub>0</sub> modulo F<sub>s</sub> and fold it into the interval [0, F<sub>s</sub>/2]. Frequencies differing by an integer number of sampling rates are indistinguishable in the sampled complex exponential. Real cosine frequencies may also reflect about the Nyquist frequency, with phase/sign consequences.</p></details>
+<details><summary>Step 2 — Test an explicit counterexample</summary><p>At 40 samples/sec, a zero-phase 12 Hz cosine and 28 Hz cosine yield identical sequences: cos(2π·12n/40) = cos(2π·28n/40) at every integer n. Change the phase to see why the simple reflected positive-frequency cosine can differ in sign of phase.</p></details>
+<details><summary>Step 3 — What about the Nyquist boundary?</summary><p>At exactly f<sub>0</sub> = F<sub>s</sub>/2, the sampled cosine becomes (−1)<sup>n</sup> cos φ; its quadrature cannot be recovered from these real samples. The usual strict bandlimit/sampling condition requires F<sub>s</sub> &gt; 2 f<sub>max</sub>, together with the relevant signal assumptions.</p></details>
+<p class="lab-muted">Source basis: independent DSP sampling mathematics; the ENEE 630 Fall 2026 syllabus identifies multirate processing as a pillar. The older lecture-page/figure audit remains incomplete, so this example is not represented as a recreation of a specific classroom figure.</p></section><p><a href="../index.html#multirate">Back to multirate topics</a> · <a href="./spectral-leakage.html">Next: spectral leakage</a></p></main><footer><div class="container footer-row">Independent student-created learning resource; not an official UMD course website.</div></footer>
+<script type="module">
+import {sampledCosine} from "./sampling-spectra-engine.js";
+const $=s=>document.getElementById(s), inputs=["signal","rate","phase","count"];
+function render(){
+try{
+ for(const key of inputs)if($(key).value.trim()==="")throw new RangeError("Complete all input fields.");
+ const f=Number($("signal").value), fs=Number($("rate").value), phi=Number($("phase").value)*Math.PI/180,N=Number($("count").value);
+ if(f>250||fs>100||N<8||N>64||Math.abs(Number($("phase").value))>180)throw new RangeError("Input outside displayed limits.");
+ const r=sampledCosine(f,fs,N,phi);
+ $("error").textContent="";
+ $("nyquist").textContent=r.nyquist.toFixed(2)+" Hz";
+ $("alias").textContent=r.frequency.toFixed(2)+" Hz";
+ $("condition").textContent=r.strictlyUnaliased?"Below Nyquist":r.atNyquist?"At Nyquist":"Aliased / above Nyquist";
+ $("chart-description").textContent=N+" samples over "+((N-1)/fs).toFixed(3)+" seconds. Input "+f+" Hz; folded frequency "+r.frequency.toFixed(3)+" Hz. Blue line is the sample sequence; orange circles mark actual samples.";
+ const canvas=$("graph"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height, pad=55;
+ const css=getComputedStyle(document.documentElement);const ink=css.getPropertyValue("--ink").trim()||"#ffffff",muted=css.getPropertyValue("--muted").trim()||"#aaaaaa";
+ ctx.clearRect(0,0,W,H);ctx.fillStyle=css.getPropertyValue("--bg").trim()||"#101820";ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle=muted;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,H/2);ctx.lineTo(W-pad,H/2);ctx.moveTo(pad,35);ctx.lineTo(pad,H-52);ctx.stroke();
+ ctx.fillStyle=ink;ctx.font="18px system-ui";ctx.fillText("Amplitude",pad+5,25);ctx.fillText("Time (seconds)",W/2-55,H-13);
+ function coord(i){return [pad+(W-2*pad)*i/(N-1),H/2-(H/2-70)*r.samples[i].value]}
+ ctx.strokeStyle="#53bafa";ctx.lineWidth=3;ctx.beginPath();r.samples.forEach((s,i)=>{const [x,y]=coord(i);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.stroke();
+ ctx.fillStyle="#ffc46b";r.samples.forEach((s,i)=>{const [x,y]=coord(i);ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill()});
+ for(let i=0;i<=4;i++){const t=i*(N-1)/(4*fs);ctx.fillStyle=muted;ctx.fillText(t.toFixed(2),pad+(W-2*pad)*i/4-12,H-30)}
+}catch(e){$("error").textContent=e.message;["nyquist","alias","condition"].forEach(k=>$(k).textContent="—");$("chart-description").textContent="Invalid input; no sample sequence plotted.";}
+}
+inputs.forEach(k=>$(k).addEventListener("input",render));
+$("reset").addEventListener("click",()=>{Object.entries({signal:28,rate:40,phase:0,count:24}).forEach(([k,v])=>$(k).value=v);render();$("signal").focus()});
+$("preset").addEventListener("click",()=>{$("signal").value=12;$("rate").value=40;$("phase").value=0;render();$("signal").focus()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&e.target.tagName==="INPUT")e.target.blur()});
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+render();
+</script></body></html>
