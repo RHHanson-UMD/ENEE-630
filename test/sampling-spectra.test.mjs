@@ -64,3 +64,11 @@ test("course-cover and both lesson links are present in live-site source tree",(
   assert.match(src,/type="module"/);
  }
 });
+
+test("optimized user-provided course cover is a valid WebP asset in the published tree",()=>{
+ const bytes=readFileSync("site/assets/enee630-course-cover.webp");
+ assert.ok(bytes.byteLength>1000);
+ assert.equal(bytes.toString("ascii",0,4),"RIFF");
+ assert.equal(bytes.toString("ascii",8,12),"WEBP");
+ assert.equal(bytes.readUInt32LE(4)+8,bytes.byteLength);
+});
