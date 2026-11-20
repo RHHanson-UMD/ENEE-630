@@ -44,3 +44,31 @@
 .resources-prompt strong{font:600 19px 'Space Grotesk'}.resources-prompt p{font-size:13px;color:var(--muted);margin:5px 0 0}
 @media(max-width:800px){.course-hero-grid{grid-template-columns:1fr;gap:25px}.course-poster{min-height:200px}.poster-visual{height:55px}.path-grid{grid-template-columns:1fr}.path-card{min-height:175px}.path-card h3{margin-top:18px}}
 @media(max-width:600px){.course-hero{padding:60px 0 48px}.course-title{font-size:42px}.topics{grid-template-columns:1fr}.demo-card,.resources-prompt{flex-direction:column;align-items:start}.demo-btn{width:100%;text-align:center}}
+
+
+/* ENEE 630 topical navigation: native details/summary preserves keyboard semantics. */
+.topic-accordion{display:grid;gap:14px;margin-top:28px}
+.topic-group{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.topic-group[open]{border-color:var(--mint)}
+.topic-group summary{display:flex;align-items:center;gap:19px;padding:22px 24px;cursor:pointer;list-style:none}
+.topic-group summary::-webkit-details-marker{display:none}
+.topic-group summary::after{content:"+";font:500 27px/1 'Space Grotesk',sans-serif;color:var(--mint);margin-left:auto}
+.topic-group[open] summary::after{content:"−"}
+.topic-group summary:hover{background:var(--surface2)}
+.topic-group summary:focus-visible{outline:3px solid var(--mint);outline-offset:-4px}
+.topic-index{font:700 14px/1 'Space Grotesk',sans-serif;color:var(--mint);flex:none}
+.topic-heading{display:grid;gap:6px;min-width:0}
+.topic-heading strong{font:600 clamp(18px,2.4vw,23px)/1.3 'Space Grotesk',sans-serif}
+.topic-heading small{font-size:12px;font-weight:500;color:var(--muted)}
+.topic-content{border-top:1px solid var(--line);padding:21px 24px 24px 56px}
+.topic-content p{color:var(--muted);font-size:14px}
+.topic-subtopics{padding-left:20px;color:var(--muted);font-size:14px;line-height:1.8}
+.topic-subtopics li{padding:5px 0}
+.topic-subtopics strong{color:var(--ink)}
+.topic-status{font-size:12px!important;color:var(--faint)!important}
+.topic-link{font-weight:700;font-size:13px;color:var(--mint);text-decoration:underline;text-underline-offset:3px}
+.topic-lesson{display:grid;gap:5px;border:1px solid var(--mint);border-radius:10px;padding:15px 17px;margin:20px 0;background:color-mix(in srgb,var(--mint) 7%,var(--surface2))}
+.topic-lesson strong{color:var(--ink);font-size:14px}
+.topic-lesson span{font-size:12px;color:var(--muted)}
+.topic-lesson:hover,.topic-lesson:focus-visible{background:var(--surface2);outline-offset:3px}
+@media(max-width:600px){.topic-group summary{padding:17px 15px;gap:12px}.topic-content{padding:16px 18px}.topic-index{font-size:12px}}
